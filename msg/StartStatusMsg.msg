@@ -1,0 +1,2 @@
+bool started
+string message
