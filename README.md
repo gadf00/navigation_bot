@@ -14,7 +14,7 @@ The `navigation_bot` package allows a robot to perform the following operations:
 ## Nodes and Functionality
 
 - **start_position.py**: Initializes the robot's starting position and publishes it to the relevant topics.
-- **interface.py**: Provides a user interface for selecting operations such as navigation, adding waypoints, and removing waypoints.
+
 - **choose_waypoint.py**: Allows the user to choose a destination waypoint from a list.
 - **navigation.py**: Handles the navigation of the robot to the selected waypoint and provides feedback on the current position.
 - **add_waypoint.py**: Allows the user to add new waypoints either by recording the current position or by entering coordinates.
