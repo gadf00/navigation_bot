@@ -1,64 +1,80 @@
 #!/usr/bin/env python3
 
 import rospy
-from std_msgs.msg import String
-from navigation_bot.msg import OperationStatusMsg
 import yaml
-import os
+from nav_msgs.msg import Odometry
+from navigation_bot.msg import NavigationStatusMsg
 
-class RemoveWaypoint:
+class AddWaypoint:
 
     def __init__(self):
-        rospy.init_node("remove_waypoint", anonymous=True)
+        rospy.init_node("add_waypoint", anonymous=True)
         self.waypoints_file = "/home/sium/catkin_ws/src/navigation_bot/scripts/waypoints.yaml"
-        rospy.Subscriber("/operation", String, self.start_removing_waypoint)
-        self.status_pub = rospy.Publisher("/operation_status", OperationStatusMsg, queue_size=10)
-        rospy.spin()
+        rospy.Subscriber("/navigation_status", NavigationStatusMsg, self.navigation_status_callback)
+        self.navigation_status = "stopped"
+        rospy.sleep(1)  # Attendere un momento per ricevere lo stato della navigazione
+        self.show_menu()
 
-    def start_removing_waypoint(self, msg):
-        if msg.data == "remove_waypoint":
-            self.remove_waypoint()
+    def navigation_status_callback(self, msg):
+        self.navigation_status = msg.status
 
-    def remove_waypoint(self):
-        waypoints = rospy.get_param("waypoints", {})
-        if not waypoints:
-            rospy.loginfo("No waypoints available.")
-            self.operation_completed("No waypoints available.")
-            return
-
-        print("Choose a waypoint to remove or type 'back' to return:")
-        for i, point in enumerate(waypoints.keys()):
-            print(f"{i}. {point}")
-
+    def show_menu(self):
         while not rospy.is_shutdown():
-            choice = input("Enter the number of the waypoint to remove: ")
-            if choice.lower() == 'back':
-                self.operation_completed("Operation cancelled by user.")
-                return
+            print("Choose how to add a waypoint or type 'back' to return:")
+            print("1. Current position")
+            print("2. Enter coordinates")
 
-            if choice.isdigit() and int(choice) in range(len(waypoints)):
-                point = list(waypoints.keys())[int(choice)]
-                del waypoints[point]
-                rospy.set_param("waypoints", waypoints)
-                self.save_waypoints(waypoints)
-                rospy.loginfo(f"Waypoint {point} removed.")
-                self.operation_completed(f"Waypoint {point} removed.")
+            choice = input("Enter the number of the option: ")
+            if choice.lower() == 'back':
+                rospy.signal_shutdown("User requested shutdown")
                 break
+
+            if choice == "1":
+                if self.navigation_status == "moving":
+                    rospy.logwarn("Cannot add waypoint of current position while robot is in motion.")
+                else:
+                    self.add_current_position()
+            elif choice == "2":
+                self.add_coordinates()
             else:
                 print("Invalid choice. Please try again.")
 
-    def save_waypoints(self, waypoints):
+    def add_current_position(self):
+        name = input("Enter the name of the waypoint: ")
+        gazebo_pose = rospy.wait_for_message("/odom", Odometry)
+        point = [gazebo_pose.pose.pose.position.x, gazebo_pose.pose.pose.position.y, gazebo_pose.pose.pose.position.z]
+        self.save_waypoint(name, point)
+
+    def add_coordinates(self):
+        name = input("Enter the name of the waypoint: ")
+        x = float(input("Enter x coordinate: "))
+        y = float(input("Enter y coordinate: "))
+        z = float(input("Enter z coordinate: "))
+        point = [x, y, z]
+        self.save_waypoint(name, point)
+
+    def save_waypoint(self, name, point):
+        waypoints = self.load_waypoints()
+        waypoints[name] = point
         with open(self.waypoints_file, 'w') as f:
             yaml.safe_dump(waypoints, f)
+        rospy.loginfo(f"Waypoint '{name}' added successfully.")
+        print(f"Waypoint '{name}' added successfully.")
 
-    def operation_completed(self, message):
-        status_msg = OperationStatusMsg()
-        status_msg.completed = True
-        status_msg.message = message
-        self.status_pub.publish(status_msg)
+    def load_waypoints(self):
+        try:
+            with open(self.waypoints_file, 'r') as f:
+                waypoints = yaml.safe_load(f)
+                if waypoints is None:
+                    waypoints = {}
+        except FileNotFoundError:
+            waypoints = {}
+        return waypoints
 
 if __name__ == "__main__":
     try:
-        RemoveWaypoint()
+        AddWaypoint()
+    except rospy.ROSInterruptException:
+        pass
     except Exception as e:
         rospy.logerr(e)

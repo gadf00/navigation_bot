@@ -53,8 +53,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  OperationStatusMsg.msg
   StartStatusMsg.msg
+  NavigationStatusMsg.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -168,7 +168,6 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   scripts/start_position.py
-  scripts/interface.py
   scripts/navigation.py
   scripts/add_waypoint.py
   scripts/remove_waypoint.py

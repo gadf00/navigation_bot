@@ -1,8 +1,5 @@
 <launch>
     <node name="start_position" pkg="navigation_bot" type="start_position.py" output="screen"/>
-    <node name="interface" pkg="navigation_bot" type="interface.py" output="screen"/>
     <node name="choose_waypoint" pkg="navigation_bot" type="choose_waypoint.py" output="screen"/>
     <node name="navigation" pkg="navigation_bot" type="navigation.py" output="screen"/>
-    <node name="add_waypoint" pkg="navigation_bot" type="add_waypoint.py" output="screen"/>
-    <node name="remove_waypoint" pkg="navigation_bot" type="remove_waypoint.py" output="screen"/>
 </launch>
