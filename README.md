@@ -23,10 +23,10 @@ The `navigation_bot` package allows a robot to perform the following operations:
 
 ## Installation and Usage
 0. **Prerequisites**:
-		- **SLAM (Simultaneous Localization and Mapping)**: Techinque used to create a map of an environment while simultaneously keeping track of a robot's location.
-		- **AMCL (Adaptive Monte Carlo Localization )**: Is a probabilistic localization system for a robot. It helps the robot to determine its position and orientation in a given map.
-		- **Move base**: It provides the interface for the robot to move autonomously to a designated goal. It uses the global planner (plans a path from the robot's current position to the goal position considering the entire map and avoiding known obstacles) and local planner (generates velocity commands to move the robot along the global path while avoiding dynamic obstacles real time.
-		- **DWA (Dynamic Window Approach)**: It is a specific type of local planner used by move base. Evaluates the robot's possible velocity within a dynamic window to choose the best velocity that avoids obstacles and moves towards the goal.
+	- **SLAM (Simultaneous Localization and Mapping)**: Techinque used to create a map of an environment while simultaneously keeping track of a robot's location.
+	- **AMCL (Adaptive Monte Carlo Localization )**: Is a probabilistic localization system for a robot. It helps the robot to determine its position and orientation in a given map.
+	- **Move base**: It provides the interface for the robot to move autonomously to a designated goal. It uses the global planner (plans a path from the robot's current position to the goal position considering the entire map and avoiding known obstacles) and local planner (generates velocity commands to move the robot along the global path while avoiding dynamic obstacles real time.
+	- **DWA (Dynamic Window Approach)**: It is a specific type of local planner used by move base. Evaluates the robot's possible velocity within a dynamic window to choose the best velocity that avoids obstacles and moves towards the goal.
    ```sh
    cd ~/catkin_ws/src
    git clone https://github.com/ROBOTIS-GIT/turtlebot3.git
